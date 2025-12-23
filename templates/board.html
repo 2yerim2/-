@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}게시판{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>📝 게시글 목록</h2>
+    <a href="{{ url_for('new_post') }}" class="btn btn-primary">✨ 새 게시글 작성</a>
+</div>
+
+{% if posts %}
+<table>
+    <thead>
+        <tr>
+            <th style="width: 10%;">🔢 번호</th>
+            <th style="width: 40%;">📌 제목</th>
+            <th style="width: 15%;">👤 작성자</th>
+            <th style="width: 20%;">📅 작성일</th>
+            <th style="width: 15%;">✏️ 수정일</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for post in posts %}
+        <tr>
+            <td>{{ post.id }}</td>
+            <td>
+                <a href="{{ url_for('post_detail', post_id=post.id) }}" class="post-title-link">
+                    📄 {{ post.title }}
+                </a>
+            </td>
+            <td>👤 {{ post.get('display_author', post.author) }}</td>
+            <td>{{ post.created_at }}</td>
+            <td>{{ post.updated_at }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p style="text-align: center; padding: 40px; color: #666;">📭 작성된 게시글이 없습니다. 첫 게시글을 작성해보세요! ✨</p>
+{% endif %}
+{% endblock %}
+

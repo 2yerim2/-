@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}{% if post %}게시글 수정{% else %}새 게시글 작성{% endif %} - 게시판{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 20px;">
+    <a href="{{ url_for('board') }}" class="btn btn-secondary">🔙 목록으로</a>
+</div>
+
+<h2>{% if post %}✏️ 게시글 수정{% else %}✨ 새 게시글 작성{% endif %}</h2>
+
+<form method="POST" action="{% if post %}{{ url_for('edit_post', post_id=post.id) }}{% else %}{{ url_for('new_post') }}{% endif %}">
+    <div class="form-group">
+        <label for="title">📌 제목</label>
+        <input type="text" id="title" name="title" value="{% if post %}{{ post.title }}{% endif %}" required>
+    </div>
+    <div class="form-group">
+        <label for="content">📝 내용</label>
+        <textarea id="content" name="content" required>{% if post %}{{ post.content }}{% endif %}</textarea>
+    </div>
+    {% if not post %}
+    <div class="form-group">
+        <label>👤 작성자 표시</label>
+        <div style="display: flex; gap: 20px; margin-top: 10px;">
+            <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer;">
+                <input type="radio" name="is_anonymous" value="false" checked style="width: auto;">
+                실명
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer;">
+                <input type="radio" name="is_anonymous" value="true" style="width: auto;">
+                익명
+            </label>
+        </div>
+    </div>
+    {% endif %}
+    <button type="submit" class="btn btn-success">{% if post %}💾 수정{% else %}✨ 작성{% endif %}</button>
+    <a href="{{ url_for('board') }}" class="btn btn-secondary">❌ 취소</a>
+</form>
+{% endblock %}
+
