@@ -7,21 +7,17 @@ from functools import wraps
 app = Flask(__name__)
 app.secret_key = 'your-secret-key-change-this-in-production'
 
-# 데이터 파일 경로
 DATA_DIR = 'data'
 USERS_FILE = os.path.join(DATA_DIR, 'users.json')
 POSTS_FILE = os.path.join(DATA_DIR, 'posts.json')
 
-# 데이터 디렉토리 생성
 os.makedirs(DATA_DIR, exist_ok=True)
 
-# JSON 파일 초기화 함수
 def init_json_file(filepath, default_data):
     if not os.path.exists(filepath):
         with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(default_data, f, ensure_ascii=False, indent=2)
 
-# 로그인 필요 데코레이터
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -31,7 +27,6 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# JSON 파일 읽기
 def read_json(filepath):
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
@@ -39,12 +34,10 @@ def read_json(filepath):
     except FileNotFoundError:
         return []
 
-# JSON 파일 쓰기
 def write_json(filepath, data):
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-# 초기화
 init_json_file(USERS_FILE, [])
 init_json_file(POSTS_FILE, [])
 
@@ -86,12 +79,10 @@ def register():
         
         users = read_json(USERS_FILE)
         
-        # 중복 체크
         if any(u['username'] == username for u in users):
             flash('이미 존재하는 사용자명입니다.')
             return render_template('register.html')
-        
-        # 새 사용자 추가
+    
         new_user = {
             'id': len(users) + 1,
             'username': username,
@@ -115,7 +106,6 @@ def logout():
 @login_required
 def board():
     posts = read_json(POSTS_FILE)
-    # 최신순으로 정렬
     posts.sort(key=lambda x: x.get('created_at', ''), reverse=True)
     return render_template('board.html', posts=posts)
 
@@ -132,15 +122,15 @@ def new_post():
             return render_template('post_form.html')
         
         posts = read_json(POSTS_FILE)
-        # 익명 선택 시 표시할 작성자명 결정
+        
         display_author = '익명' if is_anonymous else session['username']
         
         new_post = {
             'id': len(posts) + 1,
             'title': title,
             'content': content,
-            'author': session['username'],  # 실제 작성자 (수정 권한 확인용)
-            'display_author': display_author,  # 표시할 작성자명
+            'author': session['username'], 
+            'display_author': display_author,  
             'is_anonymous': is_anonymous,
             'author_id': session['user_id'],
             'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
@@ -176,7 +166,6 @@ def edit_post(post_id):
         flash('게시글을 찾을 수 없습니다.')
         return redirect(url_for('board'))
     
-    # 작성자만 수정 가능
     if post['author_id'] != session['user_id']:
         flash('수정 권한이 없습니다.')
         return redirect(url_for('post_detail', post_id=post_id))
